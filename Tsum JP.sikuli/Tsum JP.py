@@ -33,7 +33,7 @@ def myClick(button):
 def claimCoins():    
     logMsg("*** claimCoins START ***")
     
-    rankingHeaderRegion.wait("RankingHeader.png", waitDelay)
+    rankingHeaderRegion.wait("RankingTitle.png", waitDelay)
     if exists("mailBoxIcon.png", existDelay): # 若螢幕有郵件
         myClick(getLastMatch())  # 點取郵件   
     while True:
@@ -44,20 +44,20 @@ def claimCoins():
                 click(claimCoinRegion.getLastMatch())
                 claimCount += 1
                 failCount = 0
-                Region(575,257,187,63).wait("1469547378925.png", waitDelay)
+                Region(575,257,187,63).wait("coinConfirmDialog.png", waitDelay)
                 wait(0.2)
-                middleDialogRegion.click("1469546227253.png")         
-                middleDialogRegion.wait("claimNotifyDialog.png", waitDelay)
+                middleDialogRegion.click("coinConfirmOk.png")         
+                middleDialogRegion.wait("coinNotifyDialog.png", waitDelay)
                 click(middleDialogRegion.getLastMatch())
             else:
                 failCount += 1
             if mailBoxRegion.exists("mailboxEmpty.png", existDelay):
                 logMsg("End of claim: {0}".format(claimCount))
-                mailBoxRegion.click("mailBoxDialogClose.png")
+                mailBoxRegion.click("mailBoxClose.png")
                 break
             if failCount > 10 and not claimCoinRegion.exists("claimCoin.png", existDelay):
                 logMsg("No more coins: {0}".format(claimCount))
-                mailBoxRegion.click("mailBoxDialogClose.png")
+                mailBoxRegion.click("mailBoxClose.png")
                 break  
        
         if claimCount < 99:
@@ -71,7 +71,7 @@ def sendHearts(maxDrag):
     
     logMsg("*** sendHearts START ***")
     
-    rankingHeaderRegion.wait("RankingHeader.png", waitDelay)
+    rankingHeaderRegion.wait("RankingTitle.png", waitDelay)
     dragCount = 0 
     while True:        
         breakFlag = False    
@@ -79,28 +79,28 @@ def sendHearts(maxDrag):
             try:
                 if redHeartRegion.exists("redHeart.png"): 
                     click(redHeartRegion.getLastMatch()) # 送心
-                    Region(502,257,336,62).wait(Pattern("sentHeart.png").similar(0.50), waitDelay)
+                    Region(502,257,336,62).wait(Pattern("heartConfirmDialog.png").similar(0.50), waitDelay)
                     wait(0.2)
-                    middleDialogRegion.click("1469293322575.png")
-                    middleDialogRegion.wait("1469293482923.png", waitDelay) 
+                    middleDialogRegion.click("heartConfirmOk.png")
+                    middleDialogRegion.wait("heartNotifyDialog.png", waitDelay) 
                     click(Location(674, 572))  #按"愛心已寄送"
                     wait(0.3)
                 else:
-                    if rankingHeaderRegion.exists("RankingHeader.png", existDelay) and not redHeartRegion.exists("redHeart.png", existDelay):
+                    if rankingHeaderRegion.exists("RankingTitle.png", existDelay) and not redHeartRegion.exists("redHeart.png", existDelay):
                         break
             except FindFailed:
                 sentHeartErrorFix()
         if dragCount >= maxDrag: 
             break        
-        if Region(506,237,54,325).exists(Pattern("1469295945522.png").similar(0.97), existDelay): #Top of list reached 
+        if Region(506,237,54,325).exists(Pattern("topOfList.png").similar(0.97), existDelay): #Top of list reached 
             scrollFlag = "PD"
             logMsg("Top reached; scrollFlag: {0}".format(scrollFlag))
             breakFlag = True
-        if Region(472,477,101,79).exists("1469296699039.png", existDelay) : # End of list reached
+        if Region(472,477,101,79).exists("endOfList.png", existDelay) : # End of list reached
             scrollFlag = "PU"
             logMsg("Bottom reached; scrollFlag: {0}".format(scrollFlag))
             breakFlag = True
-        rankingHeaderRegion.wait("RankingHeader.png", waitDelay)
+        rankingHeaderRegion.wait("RankingTitle.png", waitDelay)
         ranking = rankingHeaderRegion.getLastMatch()
         if scrollFlag == "PD":            
             dragDrop(Location(ranking.x,ranking.y+270),Location(ranking.x,ranking.y+50))
@@ -119,7 +119,7 @@ def sentHeartErrorFix():
 
     # Clear Player Info Dialog
     searchRegion = Region(543,499,214,156)
-    if searchRegion.exists("1469333898742.png",existDelay):
+    if searchRegion.exists("playerInfoClose.png", existDelay):
         click(searchRegion.getLastMatch())
         print "Fixed player info dialog!"
     

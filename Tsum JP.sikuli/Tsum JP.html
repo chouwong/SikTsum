@@ -80,7 +80,7 @@ existDelay = <span class="dig">0.1</span> <span class="cmt"># The check if image
 waitDelay = <span class="dig">30</span> <span class="cmt"># The image wait in second</span>
 
 <span class="cmt"># Some advance settings for better program peformance</span>
-Settings.MoveMouseDelay = <span class="dig">0.2</span>
+Settings.MoveMouseDelay = <span class="dig">0.1</span>
 Settings.ObserveScanRate = <span class="dig">10</span>
 Settings.SlowMotionDelay = <span class="dig">0</span>
 
@@ -105,7 +105,7 @@ middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</
 <span class="kw">def</span> claimCoins():
     logMsg(<span class="str">"*** claimCoins START ***"</span>)
 
-    rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingHeader.png" />, waitDelay)
+    rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingTitle.png" />, waitDelay)
     <span class="kw">if</span> exists(<img src="mailBoxIcon.png" />, existDelay): <span class="cmt"># 若螢幕有郵件</span>
         myClick(getLastMatch())  <span class="cmt"># 點取郵件   </span>
     <span class="kw">while</span> True:
@@ -116,20 +116,20 @@ middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</
                 <span class="skw">click</span>(claimCoinRegion.getLastMatch())
                 claimCount += <span class="dig">1</span>
                 failCount = <span class="dig">0</span>
-                Region(<span class="dig">575</span>,<span class="dig">257</span>,<span class="dig">187</span>,<span class="dig">63</span>).<span class="skw">wait</span>(<img src="1469547378925.png" />, waitDelay)
+                Region(<span class="dig">575</span>,<span class="dig">257</span>,<span class="dig">187</span>,<span class="dig">63</span>).<span class="skw">wait</span>(<img src="coinConfirmDialog.png" />, waitDelay)
                 <span class="skw">wait</span>(<span class="dig">0.2</span>)
-                middleDialogRegion.<span class="skw">click</span>(<img src="1469546227253.png" />)
-                middleDialogRegion.<span class="skw">wait</span>(<img src="claimNotifyDialog.png" />, waitDelay)
+                middleDialogRegion.<span class="skw">click</span>(<img src="coinConfirmOk.png" />)
+                middleDialogRegion.<span class="skw">wait</span>(<img src="coinNotifyDialog.png" />, waitDelay)
                 <span class="skw">click</span>(middleDialogRegion.getLastMatch())
             <span class="kw">else</span>:
                 failCount += <span class="dig">1</span>
             <span class="kw">if</span> mailBoxRegion.exists(<img src="mailboxEmpty.png" />, existDelay):
                 logMsg(<span class="str">"End of claim: {0}"</span>.format(claimCount))
-                mailBoxRegion.<span class="skw">click</span>(<img src="mailBoxDialogClose.png" />)
+                mailBoxRegion.<span class="skw">click</span>(<img src="mailBoxClose.png" />)
                 <span class="kw">break</span>
             <span class="kw">if</span> failCount &gt; <span class="dig">10</span> <span class="kw">and</span> <span class="kw">not</span> claimCoinRegion.exists(<img src="claimCoin.png" />, existDelay):
                 logMsg(<span class="str">"No more coins: {0}"</span>.format(claimCount))
-                mailBoxRegion.<span class="skw">click</span>(<img src="mailBoxDialogClose.png" />)
+                mailBoxRegion.<span class="skw">click</span>(<img src="mailBoxClose.png" />)
                 <span class="kw">break</span>
 
         <span class="kw">if</span> claimCount &lt; <span class="dig">99</span>:
@@ -143,7 +143,7 @@ middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</
 
     logMsg(<span class="str">"*** sendHearts START ***"</span>)
 
-    rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingHeader.png" />, waitDelay)
+    rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingTitle.png" />, waitDelay)
     dragCount = <span class="dig">0</span>
     <span class="kw">while</span> True:
         breakFlag = False
@@ -151,28 +151,28 @@ middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</
             <span class="kw">try</span>:
                 <span class="kw">if</span> redHeartRegion.exists(<img src="redHeart.png" />):
                     <span class="skw">click</span>(redHeartRegion.getLastMatch()) <span class="cmt"># 送心</span>
-                    Region(<span class="dig">502</span>,<span class="dig">257</span>,<span class="dig">336</span>,<span class="dig">62</span>).<span class="skw">wait</span>(Pattern(<img src="sentHeart.png" />).similar(<span class="dig">0.50</span>), waitDelay)
+                    Region(<span class="dig">502</span>,<span class="dig">257</span>,<span class="dig">336</span>,<span class="dig">62</span>).<span class="skw">wait</span>(Pattern(<img src="heartConfirmDialog.png" />).similar(<span class="dig">0.50</span>), waitDelay)
                     <span class="skw">wait</span>(<span class="dig">0.2</span>)
-                    middleDialogRegion.<span class="skw">click</span>(<img src="1469293322575.png" />)
-                    middleDialogRegion.<span class="skw">wait</span>(<img src="1469293482923.png" />, waitDelay)
+                    middleDialogRegion.<span class="skw">click</span>(<img src="heartConfirmOk.png" />)
+                    middleDialogRegion.<span class="skw">wait</span>(<img src="heartNotifyDialog.png" />, waitDelay)
                     <span class="skw">click</span>(Location(<span class="dig">674</span>, <span class="dig">572</span>))  <span class="cmt">#按"愛心已寄送"</span>
                     <span class="skw">wait</span>(<span class="dig">0.3</span>)
                 <span class="kw">else</span>:
-                    <span class="kw">if</span> rankingHeaderRegion.exists(<img src="RankingHeader.png" />, existDelay) <span class="kw">and</span> <span class="kw">not</span> redHeartRegion.exists(<img src="redHeart.png" />, existDelay):
+                    <span class="kw">if</span> rankingHeaderRegion.exists(<img src="RankingTitle.png" />, existDelay) <span class="kw">and</span> <span class="kw">not</span> redHeartRegion.exists(<img src="redHeart.png" />, existDelay):
                         <span class="kw">break</span>
             <span class="kw">except</span> FindFailed:
                 sentHeartErrorFix()
         <span class="kw">if</span> dragCount &gt;= maxDrag:
             <span class="kw">break</span>
-        <span class="kw">if</span> Region(<span class="dig">506</span>,<span class="dig">237</span>,<span class="dig">54</span>,<span class="dig">325</span>).exists(Pattern(<img src="1469295945522.png" />).similar(<span class="dig">0.97</span>), existDelay): <span class="cmt">#Top of list reached </span>
+        <span class="kw">if</span> Region(<span class="dig">506</span>,<span class="dig">237</span>,<span class="dig">54</span>,<span class="dig">325</span>).exists(Pattern(<img src="topOfList.png" />).similar(<span class="dig">0.97</span>), existDelay): <span class="cmt">#Top of list reached </span>
             scrollFlag = <span class="str">"PD"</span>
             logMsg(<span class="str">"Top reached; scrollFlag: {0}"</span>.format(scrollFlag))
             breakFlag = True
-        <span class="kw">if</span> Region(<span class="dig">472</span>,<span class="dig">477</span>,<span class="dig">101</span>,<span class="dig">79</span>).exists(<img src="1469296699039.png" />, existDelay) : <span class="cmt"># End of list reached</span>
+        <span class="kw">if</span> Region(<span class="dig">472</span>,<span class="dig">477</span>,<span class="dig">101</span>,<span class="dig">79</span>).exists(<img src="endOfList.png" />, existDelay) : <span class="cmt"># End of list reached</span>
             scrollFlag = <span class="str">"PU"</span>
             logMsg(<span class="str">"Bottom reached; scrollFlag: {0}"</span>.format(scrollFlag))
             breakFlag = True
-        rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingHeader.png" />, waitDelay)
+        rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingTitle.png" />, waitDelay)
         ranking = rankingHeaderRegion.getLastMatch()
         <span class="kw">if</span> scrollFlag == <span class="str">"PD"</span>:
             <span class="skw">dragDrop</span>(Location(ranking.x,ranking.y+<span class="dig">270</span>),Location(ranking.x,ranking.y+<span class="dig">50</span>))
@@ -191,7 +191,7 @@ middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</
 
     <span class="cmt"># Clear Player Info Dialog</span>
     searchRegion = Region(<span class="dig">543</span>,<span class="dig">499</span>,<span class="dig">214</span>,<span class="dig">156</span>)
-    <span class="kw">if</span> searchRegion.exists(<img src="1469333898742.png" />,existDelay):
+    <span class="kw">if</span> searchRegion.exists(<img src="playerInfoClose.png" />, existDelay):
         <span class="skw">click</span>(searchRegion.getLastMatch())
         <span class="kw">print</span> <span class="str">"Fixed player info dialog!"</span>
 
