@@ -1,0 +1,210 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>Tsum JP.sikuli</h2> <a href="Tsum JP.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="cmt"># Destop top resoultion or windows size should be 1344x756</span>
+<span class="kw">import</span> datetime
+
+<span class="cmt"># Some tunable settings </span>
+scrollFlag = <span class="str">"PD"</span> <span class="cmt"># PD - pageDown; PU - pageUp</span>
+maxDrag = <span class="dig">60</span> <span class="cmt"># The number of scroll before claim coins</span>
+existDelay = <span class="dig">0.1</span> <span class="cmt"># The check if image exist delay in second</span>
+waitDelay = <span class="dig">30</span> <span class="cmt"># The image wait in second</span>
+
+<span class="cmt"># Some advance settings for better program peformance</span>
+Settings.MoveMouseDelay = <span class="dig">0.2</span>
+Settings.ObserveScanRate = <span class="dig">10</span>
+Settings.SlowMotionDelay = <span class="dig">0</span>
+
+<span class="cmt"># Declare some search region to speed up </span>
+rankingHeaderRegion = Region(<span class="dig">475</span>,<span class="dig">191</span>,<span class="dig">236</span>,<span class="dig">79</span>)
+redHeartRegion = Region(<span class="dig">763</span>,<span class="dig">209</span>,<span class="dig">104</span>,<span class="dig">378</span>)
+claimCoinRegion = Region(<span class="dig">730</span>,<span class="dig">207</span>,<span class="dig">128</span>,<span class="dig">355</span>)
+mailBoxRegion = Region(<span class="dig">471</span>,<span class="dig">145</span>,<span class="dig">407</span>,<span class="dig">585</span>)
+middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</span>,<span class="dig">444</span>,<span class="dig">294</span>)
+
+
+<span class="kw">def</span> logMsg(msg):
+    <span class="kw">print</span> datetime.datetime.now().isoformat() + <span class="str">" "</span> + msg
+
+<span class="kw">def</span> myClick(button):
+    <span class="kw">while</span> True:
+        <span class="kw">if</span> <span class="skw">click</span>(button) == <span class="dig">1</span>:
+            <span class="kw">break</span>
+        <span class="kw">else</span>:
+            <span class="skw">wait</span>(<span class="dig">0.1</span>)
+
+<span class="kw">def</span> claimCoins():
+    logMsg(<span class="str">"*** claimCoins START ***"</span>)
+
+    rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingHeader.png" />, waitDelay)
+    <span class="kw">if</span> exists(<img src="mailBoxIcon.png" />, existDelay): <span class="cmt"># 若螢幕有郵件</span>
+        myClick(getLastMatch())  <span class="cmt"># 點取郵件   </span>
+    <span class="kw">while</span> True:
+        failCount = <span class="dig">0</span>
+        claimCount = <span class="dig">0</span>
+        <span class="kw">while</span> True:
+            <span class="kw">if</span> claimCoinRegion.exists(<img src="claimCoin.png" />, existDelay):
+                <span class="skw">click</span>(claimCoinRegion.getLastMatch())
+                claimCount += <span class="dig">1</span>
+                failCount = <span class="dig">0</span>
+                Region(<span class="dig">575</span>,<span class="dig">257</span>,<span class="dig">187</span>,<span class="dig">63</span>).<span class="skw">wait</span>(<img src="1469547378925.png" />, waitDelay)
+                <span class="skw">wait</span>(<span class="dig">0.2</span>)
+                middleDialogRegion.<span class="skw">click</span>(<img src="1469546227253.png" />)
+                middleDialogRegion.<span class="skw">wait</span>(<img src="claimNotifyDialog.png" />, waitDelay)
+                <span class="skw">click</span>(middleDialogRegion.getLastMatch())
+            <span class="kw">else</span>:
+                failCount += <span class="dig">1</span>
+            <span class="kw">if</span> mailBoxRegion.exists(<img src="mailboxEmpty.png" />, existDelay):
+                logMsg(<span class="str">"End of claim: {0}"</span>.format(claimCount))
+                mailBoxRegion.<span class="skw">click</span>(<img src="mailBoxDialogClose.png" />)
+                <span class="kw">break</span>
+            <span class="kw">if</span> failCount &gt; <span class="dig">10</span> <span class="kw">and</span> <span class="kw">not</span> claimCoinRegion.exists(<img src="claimCoin.png" />, existDelay):
+                logMsg(<span class="str">"No more coins: {0}"</span>.format(claimCount))
+                mailBoxRegion.<span class="skw">click</span>(<img src="mailBoxDialogClose.png" />)
+                <span class="kw">break</span>
+
+        <span class="kw">if</span> claimCount &lt; <span class="dig">99</span>:
+            <span class="kw">break</span>
+
+    logMsg(<span class="str">"*** claimCoins END ***"</span>)
+<span class="cmt"># End claim coins</span>
+
+<span class="kw">def</span> sendHearts(maxDrag):
+    <span class="kw">global</span> scrollFlag, rankingHeaderRegion, redHeartRegion
+
+    logMsg(<span class="str">"*** sendHearts START ***"</span>)
+
+    rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingHeader.png" />, waitDelay)
+    dragCount = <span class="dig">0</span>
+    <span class="kw">while</span> True:
+        breakFlag = False
+        <span class="kw">while</span> True:
+            <span class="kw">try</span>:
+                <span class="kw">if</span> redHeartRegion.exists(<img src="redHeart.png" />):
+                    <span class="skw">click</span>(redHeartRegion.getLastMatch()) <span class="cmt"># 送心</span>
+                    Region(<span class="dig">502</span>,<span class="dig">257</span>,<span class="dig">336</span>,<span class="dig">62</span>).<span class="skw">wait</span>(Pattern(<img src="sentHeart.png" />).similar(<span class="dig">0.50</span>), waitDelay)
+                    <span class="skw">wait</span>(<span class="dig">0.2</span>)
+                    middleDialogRegion.<span class="skw">click</span>(<img src="1469293322575.png" />)
+                    middleDialogRegion.<span class="skw">wait</span>(<img src="1469293482923.png" />, waitDelay)
+                    <span class="skw">click</span>(Location(<span class="dig">674</span>, <span class="dig">572</span>))  <span class="cmt">#按"愛心已寄送"</span>
+                    <span class="skw">wait</span>(<span class="dig">0.3</span>)
+                <span class="kw">else</span>:
+                    <span class="kw">if</span> rankingHeaderRegion.exists(<img src="RankingHeader.png" />, existDelay) <span class="kw">and</span> <span class="kw">not</span> redHeartRegion.exists(<img src="redHeart.png" />, existDelay):
+                        <span class="kw">break</span>
+            <span class="kw">except</span> FindFailed:
+                sentHeartErrorFix()
+        <span class="kw">if</span> dragCount &gt;= maxDrag:
+            <span class="kw">break</span>
+        <span class="kw">if</span> Region(<span class="dig">506</span>,<span class="dig">237</span>,<span class="dig">54</span>,<span class="dig">325</span>).exists(Pattern(<img src="1469295945522.png" />).similar(<span class="dig">0.97</span>), existDelay): <span class="cmt">#Top of list reached </span>
+            scrollFlag = <span class="str">"PD"</span>
+            logMsg(<span class="str">"Top reached; scrollFlag: {0}"</span>.format(scrollFlag))
+            breakFlag = True
+        <span class="kw">if</span> Region(<span class="dig">472</span>,<span class="dig">477</span>,<span class="dig">101</span>,<span class="dig">79</span>).exists(<img src="1469296699039.png" />, existDelay) : <span class="cmt"># End of list reached</span>
+            scrollFlag = <span class="str">"PU"</span>
+            logMsg(<span class="str">"Bottom reached; scrollFlag: {0}"</span>.format(scrollFlag))
+            breakFlag = True
+        rankingHeaderRegion.<span class="skw">wait</span>(<img src="RankingHeader.png" />, waitDelay)
+        ranking = rankingHeaderRegion.getLastMatch()
+        <span class="kw">if</span> scrollFlag == <span class="str">"PD"</span>:
+            <span class="skw">dragDrop</span>(Location(ranking.x,ranking.y+<span class="dig">270</span>),Location(ranking.x,ranking.y+<span class="dig">50</span>))
+            dragCount+=<span class="dig">1</span>
+        <span class="kw">if</span> scrollFlag == <span class="str">"PU"</span>:
+            <span class="skw">dragDrop</span>(Location(ranking.x,ranking.y+<span class="dig">50</span>),Location(ranking.x,ranking.y+<span class="dig">270</span>))
+            dragCount+=<span class="dig">1</span>
+        <span class="kw">if</span> breakFlag:
+            <span class="kw">break</span>
+    logMsg(<span class="str">"*** sendHearts END ***"</span>)
+<span class="cmt"># End send hearts</span>
+
+<span class="cmt"># Abnormal handling</span>
+<span class="kw">def</span> sentHeartErrorFix():
+    logMsg(<span class="str">"*** sentHeartErrorFix START ***"</span>)
+
+    <span class="cmt"># Clear Player Info Dialog</span>
+    searchRegion = Region(<span class="dig">543</span>,<span class="dig">499</span>,<span class="dig">214</span>,<span class="dig">156</span>)
+    <span class="kw">if</span> searchRegion.exists(<img src="1469333898742.png" />,existDelay):
+        <span class="skw">click</span>(searchRegion.getLastMatch())
+        <span class="kw">print</span> <span class="str">"Fixed player info dialog!"</span>
+
+    logMsg(<span class="str">"*** sentHeartErrorFix END ***"</span>)
+<span class="cmt"># End Abnormal handling</span>
+
+<span class="cmt"># Start Main Program</span>
+<span class="kw">while</span> True:
+    claimCoins()
+    sendHearts(maxDrag)
+
+<span class="cmt"># End Main Program</span>
+
+</pre>
+</body>
+</html>
