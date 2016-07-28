@@ -1,5 +1,6 @@
 # Destop top resoultion or windows size should be 1344x756
 import datetime
+import shutil
 
 # Settings 
 scrollFlag = "PD" # PD - pageDown; PU - pageUp;
@@ -7,6 +8,7 @@ lang = "JP" # JP - Japan version; US - English version;
 maxDrag = 60 # The number of scroll before claim coins
 existDelay = 0.1 # The check if image exist delay in second
 waitDelay = 30 # The image wait in second
+imagePath = getBundlePath()
 
 # Advance settings for better program peformance
 Settings.ClickDelay = 0.1
@@ -19,8 +21,8 @@ Settings.SlowMotionDelay = 0
 Settings.UserLogs = True #False: user log calls are ignored
 Settings.UserLogPrefix = "user" #message prefix
 Settings.UserLogTime = True
-Debug.setUserLogFile(getBundlePath()+"/SikTsum"+lang+".log")
-Debug.on(4)
+Debug.setUserLogFile(imagePath+"/SikTsum"+lang+".log")
+Debug.on(1)
 
 # Declare some search region to speed up 
 titleRegion = Region(449,124,442,155) 
@@ -28,6 +30,28 @@ redHeartRegion = Region(763,209,104,378)
 claimCoinRegion = Region(730,207,128,355)
 mailBoxRegion = Region(460,105,433,623)
 middleDialogRegion = Region(453,224,444,294)
+
+# Register hot key to capture images
+def captureImages(event):
+    popup("Please move to leader board!")
+    shutil.move(capture(Region(512,212,166,32)), imagePath+"/capture/RankingTitle.png")
+    shutil.move(capture(Region(787,155,29,52)), imagePath+"/capture/mailBoxIcon.png") 
+    popup("Please scroll for red heart!")
+    tmpImagePath = capture("Please select a red heart!")
+    if tmpImagePath is not None:
+        shutil.move(tmpImagePath, imagePath+"/capture/redHeart.png")
+
+    popup("Please scroll to top of list!")
+    tmpImagePath = capture("Please select the top of list image!")
+    if tmpImagePath is not None:
+        shutil.move(tmpImagePath, imagePath+"/capture/topOfList.png")
+
+    popup("Please scroll to end of list!")
+    tmpImagePath = capture("Please select the end of list image!")
+    if tmpImagePath is not None:
+        shutil.move(tmpImagePath, imagePath+"/capture/endOfList.png")
+
+Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
 
 def claimCoins():  
     Debug.user("*** claimCoins START ***")

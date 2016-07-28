@@ -72,6 +72,7 @@
 <pre class="sikuli-code">
 <span class="cmt"># Destop top resoultion or windows size should be 1344x756</span>
 <span class="kw">import</span> datetime
+<span class="kw">import</span> shutil
 
 <span class="cmt"># Settings </span>
 scrollFlag = <span class="str">"PD"</span> <span class="cmt"># PD - pageDown; PU - pageUp;</span>
@@ -79,6 +80,7 @@ lang = <span class="str">"JP"</span> <span class="cmt"># JP - Japan version; US 
 maxDrag = <span class="dig">60</span> <span class="cmt"># The number of scroll before claim coins</span>
 existDelay = <span class="dig">0.1</span> <span class="cmt"># The check if image exist delay in second</span>
 waitDelay = <span class="dig">30</span> <span class="cmt"># The image wait in second</span>
+imagePath = getBundlePath()
 
 <span class="cmt"># Advance settings for better program peformance</span>
 Settings.ClickDelay = <span class="dig">0.1</span>
@@ -91,8 +93,8 @@ Settings.SlowMotionDelay = <span class="dig">0</span>
 Settings.UserLogs = True <span class="cmt">#False: user log calls are ignored</span>
 Settings.UserLogPrefix = <span class="str">"user"</span> <span class="cmt">#message prefix</span>
 Settings.UserLogTime = True
-Debug.setUserLogFile(getBundlePath()+<span class="str">"/SikTsum"</span>+lang+<span class="str">".log"</span>)
-Debug.on(<span class="dig">4</span>)
+Debug.setUserLogFile(imagePath+<span class="str">"/SikTsum"</span>+lang+<span class="str">".log"</span>)
+Debug.on(<span class="dig">1</span>)
 
 <span class="cmt"># Declare some search region to speed up </span>
 titleRegion = Region(<span class="dig">449</span>,<span class="dig">124</span>,<span class="dig">442</span>,<span class="dig">155</span>)
@@ -100,6 +102,28 @@ redHeartRegion = Region(<span class="dig">763</span>,<span class="dig">209</span
 claimCoinRegion = Region(<span class="dig">730</span>,<span class="dig">207</span>,<span class="dig">128</span>,<span class="dig">355</span>)
 mailBoxRegion = Region(<span class="dig">460</span>,<span class="dig">105</span>,<span class="dig">433</span>,<span class="dig">623</span>)
 middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</span>,<span class="dig">444</span>,<span class="dig">294</span>)
+
+<span class="cmt"># Register hot key to capture images</span>
+<span class="kw">def</span> captureImages(event):
+    <span class="skw">popup</span>(<span class="str">"Please move to leader board!"</span>)
+    shutil.move(<span class="skw">capture</span>(Region(<span class="dig">512</span>,<span class="dig">212</span>,<span class="dig">166</span>,<span class="dig">32</span>)), imagePath+<img src="/capture/RankingTitle.png" />)
+    shutil.move(<span class="skw">capture</span>(Region(<span class="dig">787</span>,<span class="dig">155</span>,<span class="dig">29</span>,<span class="dig">52</span>)), imagePath+<img src="/capture/mailBoxIcon.png" />)
+    <span class="skw">popup</span>(<span class="str">"Please scroll for red heart!"</span>)
+    tmpImagePath = <span class="skw">capture</span>(<span class="str">"Please select a red heart!"</span>)
+    <span class="kw">if</span> tmpImagePath <span class="kw">is</span> <span class="kw">not</span> None:
+        shutil.move(tmpImagePath, imagePath+<img src="/capture/redHeart.png" />)
+
+    <span class="skw">popup</span>(<span class="str">"Please scroll to top of list!"</span>)
+    tmpImagePath = <span class="skw">capture</span>(<span class="str">"Please select the top of list image!"</span>)
+    <span class="kw">if</span> tmpImagePath <span class="kw">is</span> <span class="kw">not</span> None:
+        shutil.move(tmpImagePath, imagePath+<img src="/capture/topOfList.png" />)
+
+    <span class="skw">popup</span>(<span class="str">"Please scroll to end of list!"</span>)
+    tmpImagePath = <span class="skw">capture</span>(<span class="str">"Please select the end of list image!"</span>)
+    <span class="kw">if</span> tmpImagePath <span class="kw">is</span> <span class="kw">not</span> None:
+        shutil.move(tmpImagePath, imagePath+<img src="/capture/endOfList.png" />)
+
+Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
 
 <span class="kw">def</span> claimCoins():
     Debug.user(<span class="str">"*** claimCoins START ***"</span>)
