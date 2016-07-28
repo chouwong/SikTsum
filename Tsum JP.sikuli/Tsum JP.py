@@ -1,107 +1,109 @@
 # Destop top resoultion or windows size should be 1344x756
 import datetime
 
-# Some tunable settings 
-scrollFlag = "PD" # PD - pageDown; PU - pageUp
+# Settings 
+scrollFlag = "PD" # PD - pageDown; PU - pageUp;
+lang = "JP" # JP - Japan version; US - English version;
 maxDrag = 60 # The number of scroll before claim coins
 existDelay = 0.1 # The check if image exist delay in second
 waitDelay = 30 # The image wait in second
 
-# Some advance settings for better program peformance
-Settings.MoveMouseDelay = 0.1                
-Settings.ObserveScanRate = 10
+# Advance settings for better program peformance
+Settings.ClickDelay = 0.1
+Settings.MoveMouseDelay = 0.1
+Settings.WaitScanRate = 20              
+#Settings.ObserveScanRate = 10
 Settings.SlowMotionDelay = 0
 
+# For Logging only
+Settings.UserLogs = True #False: user log calls are ignored
+Settings.UserLogPrefix = "user" #message prefix
+Settings.UserLogTime = True
+Debug.setUserLogFile(getBundlePath()+"/SikTsum"+lang+".log")
+Debug.on(4)
+
 # Declare some search region to speed up 
-rankingHeaderRegion = Region(475,191,236,79)
+titleRegion = Region(449,124,442,155) 
 redHeartRegion = Region(763,209,104,378)
 claimCoinRegion = Region(730,207,128,355)
-mailBoxRegion = Region(471,145,407,585)
+mailBoxRegion = Region(460,105,433,623)
 middleDialogRegion = Region(453,224,444,294)
 
-
-def logMsg(msg):
-    print datetime.datetime.now().isoformat() + " " + msg
-
-def myClick(button):
-    while True:
-        if click(button) == 1: 
-            break
-        else:
-            wait(0.1)
-        
-def claimCoins():    
-    logMsg("*** claimCoins START ***")
+def claimCoins():  
+    Debug.user("*** claimCoins START ***")
     
-    rankingHeaderRegion.wait("RankingTitle.png", waitDelay)
-    if exists("mailBoxIcon.png", existDelay): # 若螢幕有郵件
-        myClick(getLastMatch())  # 點取郵件   
+    titleRegion.wait(lang+"/RankingTitle.png", waitDelay)
+    if titleRegion.exists(lang+"/mailBoxIcon.png", existDelay): # 若螢幕有郵件
+        click(titleRegion.getLastMatch())  # 點取郵件   
     while True:
         failCount = 0
         claimCount = 0
-        while True:    
-            if claimCoinRegion.exists("claimCoin.png", existDelay):
+        while True:
+            titleRegion.wait(lang+"/mailboxTitle.png", waitDelay)
+            
+            if claimCoinRegion.exists(lang+"/claimCoin.png", existDelay):
                 click(claimCoinRegion.getLastMatch())
                 claimCount += 1
                 failCount = 0
-                Region(575,257,187,63).wait("coinConfirmDialog.png", waitDelay)
-                wait(0.2)
-                middleDialogRegion.click("coinConfirmOk.png")         
-                middleDialogRegion.wait("coinNotifyDialog.png", waitDelay)
+                Region(575,257,187,63).wait(lang+"/coinConfirmDialog.png", waitDelay)
+                while middleDialogRegion.exists(lang+"/coinConfirmOk.png", existDelay): 
+                    click(middleDialogRegion.getLastMatch())
                 click(middleDialogRegion.getLastMatch())
+                middleDialogRegion.wait(lang+"/coinNotifyDialog.png", waitDelay)
+                while middleDialogRegion.exists(lang+"/coinNotifyDialog.png",existDelay):
+                    click(middleDialogRegion.getLastMatch())
             else:
                 failCount += 1
-            if mailBoxRegion.exists("mailboxEmpty.png", existDelay):
-                logMsg("End of claim: {0}".format(claimCount))
-                mailBoxRegion.click("mailBoxClose.png")
+            if mailBoxRegion.exists(lang+"/mailboxEmpty.png", existDelay):
+                Debug.user("End of claim, collected %d times!" % claimCount)
+                mailBoxRegion.click(lang+"/mailBoxClose.png")
                 break
-            if failCount > 10 and not claimCoinRegion.exists("claimCoin.png", existDelay):
-                logMsg("No more coins: {0}".format(claimCount))
-                mailBoxRegion.click("mailBoxClose.png")
+            if failCount > 5 and not claimCoinRegion.exists(lang+"/claimCoin.png", existDelay):
+                Debug.user("No more coins, collected %d times!" % claimCount)
+                mailBoxRegion.click(lang+"/mailBoxClose.png")
                 break  
        
         if claimCount < 99:
             break
     
-    logMsg("*** claimCoins END ***")
+    Debug.user("*** claimCoins END ***")
 # End claim coins
 
 def sendHearts(maxDrag):
-    global scrollFlag, rankingHeaderRegion, redHeartRegion
+    global scrollFlag
     
-    logMsg("*** sendHearts START ***")
+    Debug.user("*** sendHearts START ***")
     
-    rankingHeaderRegion.wait("RankingTitle.png", waitDelay)
+    titleRegion.wait(lang+"/RankingTitle.png", waitDelay)
     dragCount = 0 
     while True:        
         breakFlag = False    
         while True:
             try:
-                if redHeartRegion.exists("redHeart.png"): 
+                if redHeartRegion.exists(lang+"/redHeart.png"): 
                     click(redHeartRegion.getLastMatch()) # 送心
-                    Region(502,257,336,62).wait(Pattern("heartConfirmDialog.png").similar(0.50), waitDelay)
-                    wait(0.2)
-                    middleDialogRegion.click("heartConfirmOk.png")
-                    middleDialogRegion.wait("heartNotifyDialog.png", waitDelay) 
-                    click(Location(674, 572))  #按"愛心已寄送"
-                    wait(0.3)
+                    Region(502,257,336,62).wait(Pattern(lang+"/heartConfirmDialog.png").similar(0.50), waitDelay)
+                    while middleDialogRegion.exists(lang+"/heartConfirmOk.png", existDelay):
+                        click(middleDialogRegion.getLastMatch())
+                    middleDialogRegion.wait(lang+"/heartNotifyDialog.png", waitDelay) 
+                    while middleDialogRegion.exists(lang+"/heartNotifyDialog.png", existDelay): click(Location(674, 572))
                 else:
-                    if rankingHeaderRegion.exists("RankingTitle.png", existDelay) and not redHeartRegion.exists("redHeart.png", existDelay):
+                    if titleRegion.exists(lang+"/RankingTitle.png", existDelay) and not redHeartRegion.exists(lang+"/redHeart.png", existDelay):
                         break
             except FindFailed:
                 sentHeartErrorFix()
         if dragCount >= maxDrag: 
             break        
-        if Region(506,237,54,325).exists(Pattern("topOfList.png").similar(0.97), existDelay): #Top of list reached 
+        if Region(506,237,54,325).exists(Pattern(lang+"/topOfList.png").similar(0.97), existDelay): #Top of list reached 
             scrollFlag = "PD"
-            logMsg("Top reached; scrollFlag: {0}".format(scrollFlag))
+            Debug.user("Top reached; scrollFlag: %s" % scrollFlag)
             breakFlag = True
-        if Region(472,477,101,79).exists("endOfList.png", existDelay) : # End of list reached
+        if Region(472,477,101,79).exists(lang+"/endOfList.png", existDelay) : # End of list reached
             scrollFlag = "PU"
-            logMsg("Bottom reached; scrollFlag: {0}".format(scrollFlag))
+            Debug.user("Bottom reached; scrollFlag: %s" % scrollFlag)
             breakFlag = True
-        rankingHeaderRegion.wait("RankingTitle.png", waitDelay)
-        ranking = rankingHeaderRegion.getLastMatch()
+        titleRegion.wait(lang+"/RankingTitle.png", waitDelay)
+        ranking = titleRegion.getLastMatch()
         if scrollFlag == "PD":            
             dragDrop(Location(ranking.x,ranking.y+270),Location(ranking.x,ranking.y+50))
             dragCount+=1
@@ -110,20 +112,20 @@ def sendHearts(maxDrag):
             dragCount+=1
         if breakFlag:
             break
-    logMsg("*** sendHearts END ***")
+    Debug.user("*** sendHearts END ***")
 # End send hearts
 
 # Abnormal handling
 def sentHeartErrorFix():
-    logMsg("*** sentHeartErrorFix START ***")
+    Debug.user("*** sentHeartErrorFix START ***")
 
     # Clear Player Info Dialog
     searchRegion = Region(543,499,214,156)
-    if searchRegion.exists("playerInfoClose.png", existDelay):
+    if searchRegion.exists(lang+"/playerInfoClose.png", existDelay):
         click(searchRegion.getLastMatch())
         print "Fixed player info dialog!"
     
-    logMsg("*** sentHeartErrorFix END ***")       
+    Debug.user("*** sentHeartErrorFix END ***")       
 # End Abnormal handling
 
 # Start Main Program
