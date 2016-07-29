@@ -21,7 +21,7 @@ Settings.SlowMotionDelay = 0
 Settings.UserLogs = True #False: user log calls are ignored
 Settings.UserLogPrefix = "user" #message prefix
 Settings.UserLogTime = True
-Debug.setUserLogFile(imagePath+"/SikTsum"+lang+".log")
+#Debug.setUserLogFile(imagePath+"/SikTsum"+lang+".log")
 Debug.on(1)
 
 # Declare some search region to speed up 
@@ -51,8 +51,10 @@ def captureImages(event):
     if tmpImagePath is not None:
         shutil.move(tmpImagePath, imagePath+"/capture/endOfList.png")
 
+# Register listener for captureImages
 Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
 
+# Subroutine for claim coins
 def claimCoins():  
     Debug.user("*** claimCoins START ***")
     
@@ -93,6 +95,7 @@ def claimCoins():
     Debug.user("*** claimCoins END ***")
 # End claim coins
 
+# Subroutine for send hearts
 def sendHearts(maxDrag):
     global scrollFlag
     
@@ -151,6 +154,14 @@ def sentHeartErrorFix():
     
     Debug.user("*** sentHeartErrorFix END ***")       
 # End Abnormal handling
+
+# Start General Error Fix
+def generalErrorFix():
+    if middleDialogRegion.exists(lang+"/errorDialogTitleScreen.png", existDelay):
+        while middleDialogRegion.exists(lang+"/errorDialogRetry.png", existDelay): 
+            click(middleDialogRegion.getLastMatch())
+    
+# End General Error Fix
 
 # Start Main Program
 while True:

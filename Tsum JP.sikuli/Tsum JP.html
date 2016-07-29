@@ -93,7 +93,7 @@ Settings.SlowMotionDelay = <span class="dig">0</span>
 Settings.UserLogs = True <span class="cmt">#False: user log calls are ignored</span>
 Settings.UserLogPrefix = <span class="str">"user"</span> <span class="cmt">#message prefix</span>
 Settings.UserLogTime = True
-Debug.setUserLogFile(imagePath+<span class="str">"/SikTsum"</span>+lang+<span class="str">".log"</span>)
+<span class="cmt">#Debug.setUserLogFile(imagePath+"/SikTsum"+lang+".log")</span>
 Debug.on(<span class="dig">1</span>)
 
 <span class="cmt"># Declare some search region to speed up </span>
@@ -123,8 +123,10 @@ middleDialogRegion = Region(<span class="dig">453</span>,<span class="dig">224</
     <span class="kw">if</span> tmpImagePath <span class="kw">is</span> <span class="kw">not</span> None:
         shutil.move(tmpImagePath, imagePath+<img src="/capture/endOfList.png" />)
 
+<span class="cmt"># Register listener for captureImages</span>
 Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
 
+<span class="cmt"># Subroutine for claim coins</span>
 <span class="kw">def</span> claimCoins():
     Debug.user(<span class="str">"*** claimCoins START ***"</span>)
 
@@ -165,6 +167,7 @@ Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
     Debug.user(<span class="str">"*** claimCoins END ***"</span>)
 <span class="cmt"># End claim coins</span>
 
+<span class="cmt"># Subroutine for send hearts</span>
 <span class="kw">def</span> sendHearts(maxDrag):
     <span class="kw">global</span> scrollFlag
 
@@ -223,6 +226,14 @@ Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
 
     Debug.user(<span class="str">"*** sentHeartErrorFix END ***"</span>)
 <span class="cmt"># End Abnormal handling</span>
+
+<span class="cmt"># Start General Error Fix</span>
+<span class="kw">def</span> generalErrorFix():
+    <span class="kw">if</span> middleDialogRegion.exists(lang+<img src="/errorDialogTitleScreen.png" />, existDelay):
+        <span class="kw">while</span> middleDialogRegion.exists(lang+<img src="/errorDialogRetry.png" />, existDelay):
+            <span class="skw">click</span>(middleDialogRegion.getLastMatch())
+
+<span class="cmt"># End General Error Fix</span>
 
 <span class="cmt"># Start Main Program</span>
 <span class="kw">while</span> True:
