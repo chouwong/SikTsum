@@ -58,78 +58,79 @@ def captureImages(event):
 Env.addHotkey(Key.F1, KeyModifier.ALT+KeyModifier.CTRL, captureImages)
 
 # Subroutine for wait and click
-def myWait(function, object, delay):
+def myWait(region, object, delay=waitDelay):
     failCount = 0
     while True:
         try:
-            function(object, delay)
-            return
+            region.wait(object, delay)
+            return True
         except FindFailed:
             generalErrorFix()
+            failCount += 1 
             if failCount > waitRetryCount:
                 Debug.log("myWait failed after %d attempts!" % failCount)
-                return
-            else:
-                failCount += 1
-
+                return False
+                
 # Subroutine for click
-def mySearchClick(region, object, delay):
+def myClick(region, searchObject, clickObject=None, delay=existDelay):
     clickCount = 0
-    while region.exists(object, delay):
-        click(region.getLastMatch())
-        wait(0.1)
+    success = True
+    while region.exists(searchObject, delay):
+        if clickObject == None:
+            clickObject = region.getLastMatch()
+        region.click(clickObject)
         clickCount += 1
         if clickCount > clickRetryCount:
-            Debug.log("mySearchClick failed after %d attempts!" % clickCount)
+            Debug.log("myClick failed after %d attempts!" % clickCount)
+            success = False
             break
+    wait(0.1)
+    return success
 
 # Subroutine for claim coins
 def claimCoins():  
     Debug.log("*** claimCoins START ***")
     
-    myWait(titleRegion.wait, lang+"/RankingTitle.png", waitDelay) 
+    myWait(titleRegion, lang+"/RankingTitle.png") 
     while True:        
         failCount = 0
         claimCount = 0
 
-        mySearchClick(titleRegion, lang+"/mailBoxIcon.png", existDelay)
+        myClick(titleRegion, lang+"/mailBoxIcon.png")
 
         while True:
-            myWait(titleRegion.wait, lang+"/mailboxTitle.png", waitDelay)
+            myWait(titleRegion, lang+"/mailboxTitle.png")
             
             if claimCoinRegion.exists(lang+"/claimCoin.png", existDelay):
-                click(claimCoinRegion.getLastMatch())
+                myClick(claimCoinRegion, lang+"/claimCoin.png")
                 claimCount += 1
                 failCount = 0
-                # Confirm dialog
-                myWait(Region(575,257,187,63).wait, lang+"/coinConfirmDialog.png", waitDelay)
-                mySearchClick(middleDialogRegion, lang+"/coinConfirmOk.png", existDelay)
-                # Notify dialog
-                myWait(middleDialogRegion.wait, lang+"/coinNotifyDialog.png", waitDelay)
-                mySearchClick(middleDialogRegion, lang+"/coinNotifyDialog.png",existDelay)
-
-                # Clear connection problem
-                if middleDialogRegion.exists(lang+"/errorDialogTitleScreen.png", existDelay):
-                    mySearchClick(middleDialogRegion, lang+"/errorDialogRetry.png", existDelay)
-                    Debug.log("Tried to fix Error Dialog!")
                 
+                # Confirm dialog
+                if myWait(Region(575,257,187,63), lang+"/coinConfirmDialog.png"):
+                    myClick(middleDialogRegion, lang+"/coinConfirmOk.png")
+                
+                # Notify dialog
+                if myWait(middleDialogRegion, lang+"/coinNotifyDialog.png"):
+                    myClick(middleDialogRegion, lang+"/coinNotifyDialog.png")
+                    
             else:
                 failCount += 1
-
+            
             # Empty mailbox
             if mailBoxRegion.exists(lang+"/mailboxEmpty.png", existDelay):
                 Debug.log("Empty mailbox, collected %d times!" % claimCount)
-                if mailBoxRegion.exists(lang+"/mailBoxClose.png", existDelay):
-                    click(mailBoxRegion.getLastMatch())
                 break
 
             # No more coins
-            if failCount > 5 and not claimCoinRegion.exists(lang+"/claimCoin.png", existDelay):
+            if failCount > 5:
                 Debug.log("No more coins, collected %d times!" % claimCount)
-                if mailBoxRegion.exists(lang+"/mailBoxClose.png", existDelay):
-                    click(mailBoxRegion.getLastMatch())
                 break  
-       
+
+        wait(0.2)
+        if mailBoxRegion.exists(lang+"/mailboxTitle.png", existDelay):
+            mailBoxRegion.click(lang+"/mailBoxClose.png")
+        
         if claimCount < 99:
             break
     
@@ -141,24 +142,27 @@ def sendHearts(maxDrag):
     
     Debug.log("*** sendHearts START ***")
     
-    myWait(titleRegion.wait, lang+"/RankingTitle.png", waitDelay)
+    myWait(titleRegion, lang+"/RankingTitle.png")
     dragCount = 0 
     while True:        
         breakFlag = False    
         while True:
             if redHeartRegion.exists(lang+"/redHeart.png", existDelay): 
-                click(redHeartRegion.getLastMatch())
+                myClick(redHeartRegion, lang+"/redHeart.png")
             else:
                 if titleRegion.exists(lang+"/RankingTitle.png", existDelay) and not redHeartRegion.exists(lang+"/redHeart.png", existDelay):
                     break
-            if Region(502,257,336,62).exists(Pattern(lang+"/heartConfirmDialog.png").similar(0.50), existDelay):
-                mySearchClick(middleDialogRegion, lang+"/heartConfirmOk.png", existDelay)
-            mySearchClick(middleDialogRegion, lang+"/heartNotifyDialog.png", existDelay)
-            mySearchClick(Region(543,499,214,156), lang+"/playerInfoClose.png", existDelay)
+
+            # Close player info
+            myClick(Region(543,499,214,156), lang+"/playerInfoClose.png")
+            if myWait(Region(502,257,336,62), Pattern(lang+"/heartConfirmDialog.png").similar(0.50)):
+                myClick(middleDialogRegion, lang+"/heartConfirmOk.png")
+            if myWait(middleDialogRegion, lang+"/heartNotifyDialog.png"):     
+                myClick(middleDialogRegion, lang+"/heartNotifyDialog.png", Location(674, 572))
 
             # Clear connection problem
             if middleDialogRegion.exists(lang+"/errorDialogTitleScreen.png", existDelay):
-                mySearchClick(middleDialogRegion, lang+"/errorDialogRetry.png", existDelay)
+                myClick(middleDialogRegion, lang+"/errorDialogRetry.png")
                 Debug.log("Tried to fix Error Dialog!")
 
         if dragCount >= maxDrag: 
@@ -167,7 +171,7 @@ def sendHearts(maxDrag):
             scrollFlag = "PD"
             Debug.log("Top reached; scrollFlag: %s" % scrollFlag)
             breakFlag = True
-        if Region(472,477,101,79).exists(lang+"/endOfList.png", existDelay) : # End of list reached
+        if Region(530,223,53,339).exists(lang+"/endOfList.png", existDelay) : # End of list reached
             scrollFlag = "PU"
             Debug.log("Bottom reached; scrollFlag: %s" % scrollFlag)
             breakFlag = True
@@ -181,30 +185,24 @@ def sendHearts(maxDrag):
             break
     Debug.log("*** sendHearts END ***")
 
-def sentHeartErrorFix():
-    Debug.log("*** sentHeartErrorFix START ***")
-
-    # Clear Player Info Dialog
-    searchRegion = Region(543,499,214,156)
-    if searchRegion.exists(lang+"/playerInfoClose.png", existDelay):
-        click(searchRegion.getLastMatch())
-        Debug.log("Tried to fix player info dialog!")
-    
-    Debug.log("*** sentHeartErrorFix END ***")       
-
 def generalErrorFix():
     Debug.log("*** generalErrorFix Start ***")       
 
     # Clear error code dialog
     if middleDialogRegion.exists(lang+"/errorDialogTitleScreen.png", existDelay):
-        mySearchClick(middleDialogRegion, lang+"/errorDialogRetry.png", existDelay)
+        myClick(middleDialogRegion, lang+"/errorDialogRetry.png")
         Debug.log("Tried to fix Error Dialog!")
 
     # Return back to Ranking
     if bottomRegion.exists(lang+"/playStart.png"):
-        mySearchClick(bottomRegion, lang+"/playBack.png", existDelay)
+        myClick(bottomRegion, lang+"/playBack.png")
         Debug.log("Tried to back to Ranking!")
-        
+
+    # Close mail box 
+    #if mailBoxRegion.exists(lang+"/mailboxTitle.png", existDelay):
+    #    mailBoxRegion.click(lang+"/mailBoxClose.png")
+    #    Debug.log("Tried to close mailbox!")
+
     Debug.log("*** generalErrorFix END ***")           
 
 # Start Main Program
